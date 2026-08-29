@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Agents IA</h1>
+<p class="muted">Chaque agent analyse vos données Chariow (ou la démo) et génère des livrables
+dans <code>outputs/&lt;agent&gt;/&lt;date&gt;/</code>.</p>
+
+<div class="grid">
+{% for p in personas %}
+  <section class="card">
+    <h2>{{ p.name }}</h2>
+    <p class="tagline">{{ p.tagline }}</p>
+    <ul class="tight">
+      {% for t in p.tasks %}
+      <li><code>{{ t.id }}</code> — {{ t.title }}</li>
+      {% endfor %}
+    </ul>
+    <p><a class="btn" href="/executer?persona={{ p.id }}">▶ Exécuter « {{ p.name }} »</a></p>
+  </section>
+{% endfor %}
+</div>
+{% endblock %}

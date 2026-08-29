@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Exécuter un agent</h1>
+
+<form id="run-form" data-brain="{{ settings.brain_provider }}">
+  <div class="grid">
+    <section class="card span2">
+      <h2>1 — Choisir l'agent et les tâches</h2>
+      <label>Agent
+        <select name="persona">
+          {% for p in personas %}
+          <option value="{{ p.id }}" {{ 'selected' if p.id == selected }}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      {% for p in personas %}
+      <div class="task-group" data-persona="{{ p.id }}">
+        <p class="group-label">Tâches de « {{ p.name }} » (toutes cochées par défaut) :</p>
+        {% for t in p.tasks %}
+        <label class="chk"><input type="checkbox" name="task" value="{{ t.id }}" checked> {{ t.title }}</label>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </section>
+
+    <section class="card">
+      <h2>2 — Options</h2>
+      <label class="chk"><input type="checkbox" name="demo"> Données de démonstration (pas de boutique réelle)</label>
+      <label class="chk"><input type="checkbox" name="force"> Forcer le rafraîchissement des données MCP</label>
+      <label class="chk"><input type="checkbox" name="no_brain"> Sans cerveau : écrire les prompts à copier dans votre IA</label>
+
+      <div id="ollama-wrap" style="display:none">
+        <p class="group-label">Modèle Ollama (défaut : <code>{{ settings.ollama_model }}</code>) :</p>
+        <select name="ollama_model">
+          <option value="">— modèle par défaut —</option>
+          {% for m in ollama.models %}
+          <option value="{{ m }}" {{ 'selected' if m == settings.ollama_model }}>{{ m }}</option>
+          {% endfor %}
+        </select>
+        {% if not ollama.ok %}<p class="badge err">Serveur Ollama injoignable sur {{ ollama.url }}</p>{% endif %}
+      </div>
+
+      <p style="margin-top:1rem">
+        <button type="submit" class="btn primary">▶ Lancer</button>
+      </p>
+      <p class="muted small">
+        {% if settings.brain_provider == 'none' or 'no_brain' %}
+        Cerveau actuel : <code>{{ settings.brain_provider }}</code> — les fichiers générés
+        contiendront des prompts prêts à copier.
+        {% else %}
+        Cerveau actuel : <code>{{ settings.brain_provider }}</code> — génération automatique.
+        {% endif %}
+        Sur Android, la génération Ollama peut prendre plusieurs minutes selon le modèle.
+      </p>
+    </section>
+  </div>
+</form>
+
+<section class="card" id="run-section" style="display:none">
+  <h2>3 — Journal d'exécution</h2>
+  <pre id="run-console" class="console"></pre>
+  <ul id="run-results"></ul>
+</section>
+{% endblock %}

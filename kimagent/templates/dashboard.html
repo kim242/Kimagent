@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Tableau de bord</h1>
+
+{% if not store %}
+<div class="banner">
+  Aucune donnée boutique en cache.
+  <button class="btn" data-demo>Charger les données de démonstration</button>
+  <span class="muted">ou connectez votre boutique avec <code>python -m kimagent auth && python -m kimagent fetch</code></span>
+</div>
+{% endif %}
+
+<div class="grid">
+  {% if store %}
+  <section class="card span2">
+    <h2>🏬 {{ store.name }}</h2>
+    <p class="muted">{{ store.url }} · devise {{ store.currency }}</p>
+    <div class="stats">
+      <div class="stat"><span class="stat-val">{{ store.total_revenue }}</span><span class="stat-label">Revenu total</span></div>
+      <div class="stat"><span class="stat-val">{{ store.total_sales if store.total_sales is not none else '—' }}</span><span class="stat-label">Ventes</span></div>
+      <div class="stat"><span class="stat-val">{{ store.customers if store.customers is not none else '—' }}</span><span class="stat-label">Clients</span></div>
+      <div class="stat"><span class="stat-val">{{ store.aov }}</span><span class="stat-label">Panier moyen</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-val">{{ store.rev30 }}</span><span class="stat-label">Revenu 30 j</span></div>
+      <div class="stat"><span class="stat-val">{{ store.sales30 if store.sales30 is not none else '—' }}</span><span class="stat-label">Ventes 30 j</span></div>
+      <div class="stat"><span class="stat-val">{{ '{:,}'.format(store.visits) if store.visits is not none else '—' }}</span><span class="stat-label">Visites</span></div>
+      <div class="stat"><span class="stat-val">{{ store.conversion ~ ' %' if store.conversion is not none else '—' }}</span><span class="stat-label">Conversion</span></div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="card">
+    <h2>🧠 Cerveau IA</h2>
+    <p>
+      <strong>KIMAGENT_BRAIN</strong> :
+      <span class="badge {{ 'ok' if settings.brain_configured or settings.brain_provider == 'none' else 'warn' }}">{{ settings.brain_provider }}</span>
+    </p>
+    <ul class="tight">
+      {% if settings.brain_provider == 'ollama' %}
+      <li>Modèle Ollama : <code>{{ settings.ollama_model }}</code></li>
+      <li>URL : <code>{{ settings.ollama_url }}</code></li>
+      {% elif settings.brain_provider == 'anthropic' %}
+      <li>Modèle Claude : <code>{{ settings.anthropic_model }}</code>
+        {% if not settings.anthropic_api_key %}<span class="badge err">clé manquante</span>{% endif %}</li>
+      {% elif settings.brain_provider == 'openai' %}
+      <li>Modèle GPT : <code>{{ settings.openai_model }}</code>
+        {% if not settings.openai_api_key %}<span class="badge err">clé manquante</span>{% endif %}</li>
+      {% else %}
+      <li>Mode <code>none</code> : les livrables contiennent des <strong>prompts prêts à copier</strong> dans votre IA.</li>
+      {% endif %}
+      <li class="muted">Réglages : fichier <code>.env</code> à la racine du dépôt.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>📱 Ollama (local)</h2>
+    <div id="ollama-status" class="muted">Vérification du serveur Ollama…</div>
+    <p class="muted small">
+      Pour l'activer : <code>KIMAGENT_BRAIN=ollama</code> dans <code>.env</code>,
+      puis <code>ollama serve</code> (voir <a href="/agents">docs</a>
+      <code>docs/TERMUX_OLLAMA.md</code>).
+    </p>
+  </section>
+
+  <section class="card">
+    <h2> Données boutique</h2>
+    {% if store %}
+    <ul class="tight">
+      <li>Source : <code>{{ store.source }}</code>
+        {% if store.source == 'demo' %}<span class="badge warn">données de démonstration</span>{% endif %}</li>
+      <li>Extrait le : {{ store.fetched_at }}
+        {% if store_age_h is not none and store_age_h < 999 %}(il y a {{ '%.1f'|format(store_age_h) }} h){% endif %}</li>
+    </ul>
+    <p>
+      <button class="btn" data-demo>Recharger la démo</button>
+      <span class="muted small">Réel : <code>python -m kimagent fetch --force</code></span>
+    </p>
+    {% else %}
+    <p><button class="btn" data-demo>Charger les données de démonstration</button></p>
+    {% endif %}
+  </section>
+</div>
+
+<section class="card">
+  <h2>🚀 Actions rapides</h2>
+  <p>
+    <a class="btn" href="/executer?persona=marketing">▶ Lancer un agent IA</a>
+    <a class="btn" href="/rapport">📊 Rapport boutique</a>
+    <a class="btn" href="/objectif">🎯 Objectif de CA (FCFA)</a>
+    <a class="btn" href="/outputs">📁 Voir les livrables ({{ outputs_count }})</a>
+  </p>
+</section>
+
+{% if latest %}
+<section class="card">
+  <h2>🕘 Derniers livrables</h2>
+  <ul class="tight">
+  {% for g in latest %}
+    <li><a href="/outputs/view/{{ g.persona }}/{{ g.date }}/{{ g.files[0].name }}">{{ g.persona }} / {{ g.date }}</a>
+      — {{ g.files|length }} fichier(s)</li>
+  {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

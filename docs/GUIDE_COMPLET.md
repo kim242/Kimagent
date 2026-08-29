@@ -129,6 +129,25 @@ Kimagent écrit des **prompts prêts à copier** : ouvrez Claude Desktop ou
 ChatGPT (connecté à Chariow), collez le prompt, et collez la réponse dans le
 fichier. Les prompts sont aussi disponibles dans [`agents/personas/`](../agents/personas/).
 
+### 5.5 Interface graphique (web)
+
+Au lieu de la ligne de commande, Kimagent fournit une interface web **100 %
+locale** (Flask). Utile sur bureau, et sur **Android/Termux** où Tkinter est
+indisponible :
+
+```bash
+.venv/bin/python -m kimagent gui            # → http://127.0.0.1:5000
+.venv/bin/python -m kimagent gui --open     # et ouvre le navigateur
+```
+
+Sur Android, ouvrez `http://127.0.0.1:5000` dans Chrome. Le serveur n'écoute
+que sur `127.0.0.1` par défaut : aucune donnée ne quitte la machine.
+
+- **Tableau de bord** : chiffres boutique, cerveau IA, état d'Ollama (modèles).
+- **Exécuter** : lancez un agent en un clic, avec journal en direct.
+- **Livrables** : consultation et téléchargement des fichiers générés.
+- **Rapport / Objectif** : synthèse boutique et tableau de bord CA (FCFA).
+
 ---
 
 ## 6. Automatiser (cron)

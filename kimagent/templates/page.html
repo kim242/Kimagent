@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+{% if banner %}<div class="banner">{{ banner }}</div>{% endif %}
+<article class="md">
+  {{ html|safe }}
+</article>
+{% endblock %}

@@ -56,6 +56,27 @@ bash scripts/install_termux.sh
 
 Les livrables sont écrits dans `outputs/<persona>/<date>/`.
 
+## 🖥️ Interface graphique
+
+Kimagent embarque une **interface web locale** (Flask) — pratique sur bureau,
+**et sur Android/Termux** (Tkinter n'existe pas sur Termux, le navigateur si) :
+
+```bash
+.venv/bin/python -m kimagent gui           # → http://127.0.0.1:5000
+.venv/bin/python -m kimagent gui --open    # et ouvre le navigateur
+```
+
+Sur Android, ouvrez simplement `http://127.0.0.1:5000` dans Chrome.
+Le serveur reste **100 % local** (n'écoute que sur `127.0.0.1` par défaut) :
+aucune donnée ne quitte votre machine.
+
+- **Tableau de bord** : chiffres de la boutique, cerveau IA configuré, état
+  du serveur **Ollama** et de ses modèles.
+- **Exécuter** : lancez un agent en un clic (tâches au choix, démo, modèle
+  Ollama au choix) avec journal d'exécution en direct.
+- **Livrables** : consultez, relisez et téléchargez les fichiers générés.
+- **Rapport** et **Objectif** : synthèse boutique et tableau de bord CA (FCFA).
+
 ## ⚙️ Choisir le cerveau IA
 
 Dans `.env` :
@@ -70,7 +91,7 @@ Dans `.env` :
 ## 📦 Contenu du dépôt
 
 ```
-kimagent/          Agent Python (CLI) : auth, fetch, run, report…
+kimagent/          Agent Python (CLI + interface graphique web Flask)
 agents/personas/   Les 6 agents IA + leurs prompts prêts à l'emploi (Markdown)
 mcp/               Configs & guides de connexion (Claude, ChatGPT, Cursor, Windsurf)
 docs/              Guide complet en français
