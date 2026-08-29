@@ -19,7 +19,7 @@ pour les développeurs et les IA :
 **Kimagent** est l'agent qui exploite ces interfaces : il récupère les données
 de votre boutique, les analyse, et génère automatiquement des livrables
 concrets (posts, emails, pages produit, stratégies de prix, campagnes de
-relance, plans d'affiliation…).
+relance, plans d'affiliation, **e-books professionnels complets**…).
 
 ---
 
@@ -84,7 +84,7 @@ de 60 requêtes/min du serveur MCP.
 
 ## 5. Générer des livrables avec les agents
 
-### 5.1 Les 6 personas
+### 5.1 Les 7 personas
 
 | Persona | Tâches (livrables) |
 |---|---|
@@ -94,6 +94,7 @@ de 60 requêtes/min du serveur MCP.
 | `finance` | bilan 30 j, clients à forte valeur |
 | `support` | paniers abandonnés, réactivation, avis |
 | `affiliation` | audit programme, recrutement, kit de vente |
+| `ebook` | analyse marché, plan, **rédaction complète d'e-book**, page de vente, couverture |
 
 ### 5.2 Lancer un agent
 
@@ -174,6 +175,10 @@ Limite : 100 requêtes/min. Ne committez jamais `.env`.
    séquence d'emails prête à envoyer via votre outil d'emailing.
 5. **Lancer l'affiliation** — `kimagent run affiliation` + invitations via
    l'API → des tiers vendent pour vous 24h/24.
+6. **Créer un e-book qui se vend** — `kimagent run ebook` : l'agent analyse
+   les meilleures ventes de votre boutique, choisit le sujet le plus rentable,
+   rédige l'e-book complet, puis fournit la fiche produit Chariow et la page
+   de vente prêtes à publier (voir [`agents/personas/ebook.md`](../agents/personas/ebook.md)).
 
 ---
 

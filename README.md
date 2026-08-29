@@ -16,6 +16,7 @@ financières, relances clients et programme d'affiliation.
 | **finance** | Bilan 30 jours, analyse des clients à forte valeur | Revenus par produit, recommandations |
 | **support** | Campagnes paniers abandonnés, réactivation clients, collecte d'avis | 3 emails de relance prêts à envoyer |
 | **affiliation** | Audit du programme, plan de recrutement, kit de vente pour affiliés | Email d'invitation affiliés |
+| **ebook** | Analyse marché, plan, **rédaction complète d'e-books**, page de vente, couverture | E-book 4 000-8 000 mots prêt à publier |
 
 ## 🚀 Démarrage rapide (2 minutes)
 

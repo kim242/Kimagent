@@ -14,6 +14,7 @@ gagner de l'argent** avec votre boutique Chariow.
 | [`finance.md`](finance.md) | Analyse Financière | identifiant où l'argent se gagne et se perd |
 | [`support.md`](support.md) | Relation Client & Relances | récupérant les paniers abandonnés et fidélisant |
 | [`affiliation.md`](affiliation.md) | Programme d'Affiliation | déployant un réseau d'affiliés qui vendent pour vous |
+| [`ebook.md`](ebook.md) | **Éditeur d'E-books** | **rédigeant des e-books professionnels qui résolvent de vrais problèmes et se vendent** |
 
 ## Deux façons de les utiliser
 

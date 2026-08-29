@@ -16,6 +16,7 @@ class Task:
     title: str
     prompt: str          # instructions données au LLM
     output_file: str     # nom du fichier livrable (dans outputs/<persona>/<date>/)
+    special: str | None = None   # exécution spéciale (ex: "ebook_redaction")
 
 
 @dataclass
@@ -343,6 +344,149 @@ _register(Persona(
                 "démonstration, bonus). Ce kit doit être copiable tel quel."
             ),
             output_file="kit-vente-affilies.md",
+        ),
+    ],
+))
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. EBOOK — création d'e-books professionnels qui se vendent
+# ─────────────────────────────────────────────────────────────────────────────
+_register(Persona(
+    id="ebook",
+    name="Éditeur d'E-books",
+    tagline="Rédige des e-books professionnels qui résolvent de vrais problèmes et se vendent.",
+    system_prompt=(
+        "Tu es un éditeur et rédacteur d'e-books professionnel de haut niveau. Tu transformes "
+        "des problèmes réels et douloureux en e-books structurés, pratiques et vendeurs.\n\n"
+        "CONNAISSANCE DU MARCHÉ (Chariow et produits numériques francophones) :\n"
+        "- Les e-books et guides pratiques se vendent très bien car ils résolvent un problème "
+        "précis, sont abordables (souvent 5 à 30 €) et exploitables immédiatement.\n"
+        "- Les 10 niches les plus rentables en Afrique francophone (où Chariow est très actif) : "
+        "1) business en ligne / monétisation, 2) freelancing, 3) agriculture & élevage, "
+        "4) finance personnelle / épargne, 5) cuisine & nutrition, 6) santé & bien-être, "
+        "7) éducation & orientation, 8) artisanat & création, 9) technologie & numérique, "
+        "10) développement personnel.\n"
+        "- Les acheteurs sont souvent sur mobile, entre deux messages WhatsApp et une "
+        "transaction Mobile Money : le contenu doit aller droit au but, être actionnable, "
+        "sans jargon inutile.\n"
+        "- Un titre qui vend : bénéfice + délai + preuve sociale (ex. « 3 méthodes simples "
+        "pour générer 500 €/mois avec ton business en ligne »).\n"
+        "- Structure d'un e-book qui vend : couverture percutante, sommaire clair, chapitres "
+        "courts et pratiques (listes, étapes, exemples, modèles à copier), conclusion avec "
+        "appel à l'action.\n\n"
+        "RÈGLES DE RÉDACTION :\n"
+        "- Rédige en français, ton professionnel mais chaleureux et direct (tutoiement).\n"
+        "- Chaque chapitre doit donner des étapes concrètes, des exemples et des modèles "
+        "copiables. Jamais de blabla.\n"
+        "- Utilise les données réelles de la boutique (meilleures ventes, catégories, prix, "
+        "pays des clients) pour choisir le sujet et positionner le prix.\n"
+        "- Ne jamais inventer de statistiques de la boutique ; tu peux citer des tendances "
+        "générales du marché en les présentant comme telles."
+    ),
+    tasks=[
+        Task(
+            id="analyse",
+            title="Analyse du marché & sujet gagnant",
+            prompt=(
+                "Analyse la boutique : produits, meilleures ventes, catégories, prix, pays "
+                "des clients. Croise avec les niches d'e-books les plus rentables "
+                "(business en ligne, freelancing, finance personnelle, agriculture, cuisine, "
+                "santé, éducation, artisanat, numérique, développement personnel).\n"
+                "Produis :\n"
+                "1. Le classement des 5 sujets d'e-book les plus prometteurs POUR CETTE "
+                "boutique (adéquation avec la marque et les clients existants).\n"
+                "2. Pour chaque sujet : le problème douloureux résolu, le public cible précis, "
+                "le prix conseillé (avec justification), la concurrence probable sur Chariow "
+                "et le potentiel de revenu mensuel estimé.\n"
+                "3. Le sujet GAGNANT recommandé (celui à rédiger en premier) et pourquoi."
+            ),
+            output_file="analyse-marche-sujet.md",
+        ),
+        Task(
+            id="plan",
+            title="Plan détaillé de l'e-book",
+            prompt=(
+                "À partir du sujet gagnant : conçois le plan complet de l'e-book.\n"
+                "Fournis :\n"
+                "- Titre principal (formule bénéfice + délai + preuve sociale), 3 variantes "
+                "de titre, et le sous-titre.\n"
+                "- Public cible précis (qui, quel problème, quelle urgence).\n"
+                "- La promesse centrale de l'e-book (en une phrase).\n"
+                "- Le sommaire détaillé : 8 à 12 chapitres, chacun avec un objectif "
+                "d'apprentissage et 4-6 sections à développer.\n"
+                "- 3 bonus (checklists, modèles, ressources).\n"
+                "- Le nombre de pages cible (40-80 pages) et le prix de vente conseillé.\n"
+                "Ce plan doit être prêt pour la rédaction."
+            ),
+            output_file="plan-ebook.md",
+        ),
+        Task(
+            id="redaction",
+            title="Rédaction complète de l'e-book",
+            prompt=(
+                "Rédige l'e-book complet en Markdown, chapitre par chapitre, en suivant le "
+                "plan (ou en créant un plan solide si absent).\n\n"
+                "FORMAT EXIGÉ :\n"
+                "# Titre de l'e-book\n"
+                "sous-titre · auteur (à personnaliser)\n\n"
+                "## À propos de cet e-book\n"
+                "(promesse, public, comment utiliser le guide)\n\n"
+                "## Sommaire\n"
+                "(liste des chapitres)\n\n"
+                "## Chapitre 1 — …\n"
+                "… (chaque chapitre : intro courte, sections avec titres ## et ###, listes, "
+                "étapes numérotées, encadrés « À retenir », exemples concrets, modèles "
+                "copiables)\n\n"
+                "…\n\n"
+                "## Conclusion — Votre plan d'action 7 jours\n"
+                "(étapes jour par jour + appel à l'action vers la boutique)\n\n"
+                "## Bonus — Modèles & ressources\n"
+                "(checklists, gabarits, ressources)\n\n"
+                "RÈGLES :\n"
+                "- Longueur professionnelle : au moins 6 chapitres, 4 000 à 8 000 mots.\n"
+                "- Ton chaleureux et direct, tutoiement, phrases courtes.\n"
+                "- Chaque chapitre se termine par un encadré « À retenir ».\n"
+                "- Contenu 100 % actionnable : étapes, exemples, modèles à copier.\n"
+                "- Aucun contenu générique : chaque conseil doit être applicable immédiatement.\n"
+                "- Relis et structure proprement en Markdown."
+            ),
+            output_file="ebook-complet.md",
+            special="ebook_redaction",
+        ),
+        Task(
+            id="page_vente",
+            title="Page de vente & fiche produit Chariow",
+            prompt=(
+                "Rédige le matériel de vente complet pour l'e-book :\n\n"
+                "1. PAGE DE VENTE (page d'atterrissage) : titre, sous-titre, accroche, "
+                "problème → solution, 6-8 bénéfices, contenu de l'e-book (chapitres), "
+                "preuve sociale (témoignages plausibles à remplacer par de vrais), "
+                "garantie, prix (avec ancrage : valeur réelle vs prix promo), CTA, FAQ (5 "
+                "questions), urgence.\n\n"
+                "2. FICHE PRODUIT CHARIOW prête à créer : nom du produit, slug, "
+                "description courte (max 160 caractères), description longue, catégorie, "
+                "type (downloadable), prix conseillé, et 5 mots-clés SEO.\n\n"
+                "3. 10 posts de lancement (réseaux sociaux) pour promouvoir l'e-book.\n\n"
+                "4. Email d'annonce à votre liste + email de relance (48 h après)."
+            ),
+            output_file="page-vente-fiche-produit.md",
+        ),
+        Task(
+            id="couverture",
+            title="Couverture & maquette",
+            prompt=(
+                "Conçois la couverture de l'e-book en DÉTAIL TEXTE (pour un designer ou une "
+                "IA d'image) :\n"
+                "- Concept visuel : style, ambiance, palette de couleurs (avec codes hex), "
+                "typographies recommandées, composition.\n"
+                "- Titre et sous-titre exacts sur la couverture, hiérarchie visuelle.\n"
+                "- Visuel principal à générer (description précise pour une IA d'image).\n"
+                "- Variante A (propre/minimaliste) et variante B (colorée/impactante).\n"
+                "- 3 maquettes de pages intérieures : page de titre, sommaire, chapitre "
+                "(description précise).\n"
+                "Le tout doit être réalisable avec Canva ou une IA d'image en 30 minutes."
+            ),
+            output_file="couverture-maquette.md",
         ),
     ],
 ))

@@ -21,6 +21,7 @@ from .brain import Brain, compact_context
 from .chariow_mcp import fetch_store_data
 from .config import DATA_DIR, OUTPUTS_DIR, Settings, ensure_dirs
 from .demo_data import get_demo_data
+from .ebook_engine import write_ebook
 from .personas import Persona, Task, get_persona, list_personas
 
 CACHE_FILE = DATA_DIR / "store_data.json"
@@ -99,8 +100,15 @@ def run_persona(
     written: list[Path] = []
     for task in tasks:
         utils.step(f"Tâche : {task.title}")
-        content = asyncio.run(_produce(brain, persona, task, context))
         path = out_dir / task.output_file
+        if task.special == "ebook_redaction" and brain is not None:
+            # Rédaction longue : moteur dédié (chapitres par lots, contrôle longueur)
+            manuscript = asyncio.run(
+                write_ebook(brain, task.prompt, context, path, out_dir, data)
+            )
+            written.append(path)
+            continue
+        content = asyncio.run(_produce(brain, persona, task, context))
         path.write_text(content, encoding="utf-8")
         written.append(path)
         utils.ok(f"Écrit : {path.relative_to(OUTPUTS_DIR.parent)}")

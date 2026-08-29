@@ -1,5 +1,6 @@
 """Tests de fumée Kimagent (mode démo, sans réseau, sans clé API)."""
 
+import asyncio
 import tempfile
 import unittest
 from pathlib import Path
@@ -68,6 +69,79 @@ class TestPipeline(unittest.TestCase):
         report = build_report(get_demo_data())
         self.assertIn("FormationPro Digital", report)
         self.assertIn("€", report)
+
+
+class TestEbookEngine(unittest.TestCase):
+    """Valide le moteur de rédaction d'e-books (découpage, comptage, assemblage)."""
+
+    def _fake_brain(self, chapters_per_call=3, words_per_chapter=250):
+        """Cerveau simulé : renvoie des chapitres génériques mais bien formés."""
+        from kimagent.brain import Brain
+
+        class FakeBrain(Brain):
+            def __init__(self, settings):
+                super().__init__(settings)
+                self.calls = 0
+
+            async def generate(self, system_prompt, task_prompt, context, max_tokens=4000):
+                self.calls += 1
+                # Extrait le nombre de chapitres demandés dans la consigne
+                import re
+
+                m = re.findall(r"## Chapitre (\d+) — (.+)", task_prompt)
+                parts = ["# Mon E-book Professionnel\n\n## À propos de cet e-book\n\nIntroduction."]
+                for num, title in m:
+                    body = "\n\n".join(
+                        f"Paragraphe {j} : contenu concret et actionnable du chapitre sur "
+                        f"{title}. Étape pratique numéro {j} à appliquer immédiatement."
+                        for j in range(1, 8)
+                    )
+                    parts.append(f"## Chapitre {num} — {title}\n\n{body}\n\n**À retenir :** l'essentiel de {title}.")
+                return "\n\n".join(parts)
+
+        return FakeBrain(Settings())
+
+    def test_engine_writes_complete_ebook(self):
+        from kimagent.ebook_engine import write_ebook
+        from kimagent.personas import get_persona
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            data = get_demo_data()
+            brain = self._fake_brain()
+            task = get_persona("ebook").task("redaction")
+
+            # Sans plan : le moteur doit générer via repli (8 chapitres par défaut)
+            final = asyncio.run(
+                write_ebook(brain, task.prompt, "contexte", out_dir / "ebook.md", out_dir, data)
+            )
+            self.assertTrue((out_dir / "ebook.md").exists())
+            self.assertIn("# ", final)
+            self.assertGreaterEqual(final.count("## Chapitre"), 6)
+            self.assertGreater(brain.calls, 1)  # plusieurs lots → découpage actif
+            self.assertGreater(len(final.split()), 1500)
+
+    def test_engine_uses_existing_plan(self):
+        from kimagent.ebook_engine import write_ebook
+        from kimagent.personas import get_persona
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            (out_dir / "plan-ebook.md").write_text(
+                "# Plan\n\n## Chapitre 1 — Découvrir\n## Chapitre 2 — Préparer\n"
+                "## Chapitre 3 — Agir\n## Chapitre 4 — Accélérer\n## Chapitre 5 — Pérenniser\n"
+                "## Chapitre 6 — Passer à l'échelle\n## Chapitre 7 — Éviter les erreurs\n"
+                "## Chapitre 8 — Plan d'action\n",
+                encoding="utf-8",
+            )
+            brain = self._fake_brain()
+            task = get_persona("ebook").task("redaction")
+            final = asyncio.run(
+                write_ebook(brain, task.prompt, "contexte", out_dir / "ebook.md", out_dir, get_demo_data())
+            )
+            # Les titres du plan doivent apparaître dans le manuscrit
+            for title in ("Découvrir", "Passer à l'échelle"):
+                self.assertIn(title, final)
 
 
 if __name__ == "__main__":
