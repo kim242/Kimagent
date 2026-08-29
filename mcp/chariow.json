@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "chariow": {
+      "url": "https://mcp.chariow.com/public",
+      "type": "sse"
+    }
+  }
+}

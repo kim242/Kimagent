@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Secrets & configuration locale
+.env
+.chariow/
+
+# Données et livrables générés (ne jamais versionner)
+data/
+outputs/
+logs/
+
+# OS / éditeurs
+.DS_Store
+*.swp
+.idea/
+.vscode/
