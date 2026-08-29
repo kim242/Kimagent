@@ -38,6 +38,22 @@ cp .env.example .env          # puis ouvrez .env et choisissez votre cerveau IA
 .venv/bin/python -m kimagent report
 ```
 
+## 📱 Démarrage rapide sur Android (Termux + Ollama)
+
+Kimagent fonctionne **100 % localement sur Android** grâce à Termux et Ollama —
+aucun serveur distant, aucune clé API payante.
+
+```bash
+# Dans Termux (installez-le depuis F-Droid, pas Play Store)
+pkg install python git curl
+git clone https://github.com/kim242/Kimagent.git && cd Kimagent
+
+# Installation automatique tout-en-un
+bash scripts/install_termux.sh
+```
+
+> 📖 Guide détaillé : [`docs/TERMUX_OLLAMA.md`](docs/TERMUX_OLLAMA.md)
+
 Les livrables sont écrits dans `outputs/<persona>/<date>/`.
 
 ## ⚙️ Choisir le cerveau IA
@@ -49,7 +65,7 @@ Dans `.env` :
 | `none` | — | Kimagent écrit des **prompts prêts à copier** dans Claude Desktop, ChatGPT, Cursor… (recommandé pour démarrer, gratuit) |
 | `anthropic` | `ANTHROPIC_API_KEY` | Génération automatique avec Claude |
 | `openai` | `OPENAI_API_KEY` | Génération automatique avec GPT |
-| `ollama` | — | Modèle local gratuit (Ollama) |
+| `ollama` | — | Modèle local gratuit (Ollama) — fonctionne aussi sur Android (Termux) |
 
 ## 📦 Contenu du dépôt
 
@@ -74,6 +90,7 @@ tests/             Tests
 ## 📚 Documentation
 
 - **Guide complet** : [`docs/GUIDE_COMPLET.md`](docs/GUIDE_COMPLET.md)
+- **Android / Termux + Ollama** : [`docs/TERMUX_OLLAMA.md`](docs/TERMUX_OLLAMA.md)
 - **Connexion des outils IA** : [`mcp/setup.md`](mcp/setup.md)
 - **Les 21 outils MCP** : [`mcp/tools.md`](mcp/tools.md)
 - **Sécurité** : [`mcp/security.md`](mcp/security.md)

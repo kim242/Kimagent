@@ -1,9 +1,12 @@
 # Kimagent — commandes utiles
-.PHONY: install auth fetch demo run report list test cron
+.PHONY: install install-termux auth fetch demo run report list test cron
 
 install:            ## Installe les dépendances (venv)
 	python3 -m venv .venv
 	.venv/bin/pip install -r requirements.txt
+
+install-termux:     ## Installe Kimagent sur Android (Termux + Ollama)
+	bash scripts/install_termux.sh
 
 auth:               ## Connecte votre compte Chariow (OAuth, une seule fois)
 	.venv/bin/python -m kimagent auth
