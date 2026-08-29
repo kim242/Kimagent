@@ -27,6 +27,7 @@ clients, analytics). Kimagent automatise ce travail.
 .venv/bin/python -m kimagent list        # personas et tâches disponibles
 .venv/bin/python -m kimagent run <persona> [--tasks a,b] [--demo] [--no-brain]
 .venv/bin/python -m kimagent prompts <persona> [--task X]
+.venv/bin/python -m kimagent gui [--host 127.0.0.1] [--port 5000] [--open]
 ```
 
 ## Ce que les agents IA (vous) pouvez faire dans ce dépôt

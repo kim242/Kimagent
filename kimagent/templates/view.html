@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="crumbs">
+  <a href="/outputs">← Livrables</a>
+  <span class="muted">outputs/{{ persona }}/{{ date }}/{{ fname }}</span>
+  <a href="/outputs/download/{{ persona }}/{{ date }}/{{ fname }}">⬇ Télécharger</a>
+</p>
+<article class="md">
+  {{ html|safe }}
+</article>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if title %}{{ title }} — {% endif %}Kimagent</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🤖 <strong>Kimagent</strong>
+    <span class="sub">boutique Chariow · agents IA</span>
+  </div>
+  <nav>
+    <a href="/" class="{{ 'active' if nav == 'home' }}">Tableau de bord</a>
+    <a href="/agents" class="{{ 'active' if nav == 'agents' }}">Agents</a>
+    <a href="/executer" class="{{ 'active' if nav == 'execute' }}">Exécuter</a>
+    <a href="/outputs" class="{{ 'active' if nav == 'outputs' }}">Livrables</a>
+    <a href="/rapport" class="{{ 'active' if nav == 'rapport' }}">Rapport</a>
+    <a href="/objectif" class="{{ 'active' if nav == 'objectif' }}">Objectif</a>
+  </nav>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer>Kimagent — 100 % local · serveur MCP Chariow en lecture seule · v1.0</footer>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

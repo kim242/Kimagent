@@ -8,6 +8,7 @@ Commandes :
   kimagent tools     → liste les outils MCP exposés par le serveur Chariow
   kimagent prompts   → affiche les prompts prêts à copier pour une tâche
   kimagent cron      → affiche la ligne crontab pour l'automatisation
+  kimagent gui       → interface graphique web (Flask, 100 % locale)
 """
 
 from __future__ import annotations
@@ -73,6 +74,13 @@ def _build_parser() -> argparse.ArgumentParser:
     p_cron.add_argument("--personas", default="marketing,ventes,finance",
                         help="Personas à planifier (séparés par des virgules)")
     p_cron.add_argument("--heure", default="7", help="Heure d'exécution (0-23)")
+
+    p_gui = sub.add_parser("gui", help="Interface graphique web (Flask, 100 % locale)")
+    p_gui.add_argument("--host", default="127.0.0.1",
+                       help="Adresse d'écoute (défaut : 127.0.0.1, local uniquement)")
+    p_gui.add_argument("--port", type=int, default=5000, help="Port HTTP (défaut : 5000)")
+    p_gui.add_argument("--open", action="store_true",
+                       help="Ouvrir le navigateur automatiquement")
 
     p_obj = sub.add_parser("objectif", help="Tableau de bord : objectif de CA 30 jours (FCFA)")
     p_obj.add_argument("--demo", action="store_true", help="Utiliser les données de démonstration")
@@ -252,6 +260,12 @@ def _cmd_objectif(args) -> int:
     return 0
 
 
+def _cmd_gui(args) -> int:
+    from .gui import run_gui
+
+    return run_gui(host=args.host, port=args.port, open_browser=args.open)
+
+
 def _cmd_cron(args) -> int:
     python = str(REPO_ROOT / ".venv" / "bin" / "python")
     kimagent = str(REPO_ROOT / "kimagent" / "cli.py")
@@ -281,6 +295,7 @@ def main(argv: list[str] | None = None) -> int:
         "prompts": _cmd_prompts,
         "cron": _cmd_cron,
         "objectif": _cmd_objectif,
+        "gui": _cmd_gui,
     }
     return handlers[args.command](args)
 

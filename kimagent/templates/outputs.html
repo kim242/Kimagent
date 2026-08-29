@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Livrables</h1>
+<p class="muted">Fichiers générés par les agents, dans <code>outputs/</code>.</p>
+
+{% if not groups %}
+<div class="banner">Aucun livrable pour l'instant.
+  <a class="btn" href="/executer?persona=marketing">▶ Lancer un agent</a></div>
+{% endif %}
+
+{% for g in groups %}
+<section class="card">
+  <h2>{{ g.persona }} <span class="muted">— {{ g.date }}</span></h2>
+  <table>
+    <tr><th>Fichier</th><th>Taille</th><th>Modifié</th><th></th></tr>
+    {% for f in g.files %}
+    <tr>
+      <td><a href="/outputs/view/{{ g.persona }}/{{ g.date }}/{{ f.name }}">{{ f.name }}</a></td>
+      <td>{{ (f.size / 1024)|round(1) }} Ko</td>
+      <td>{{ f.mtime }}</td>
+      <td><a href="/outputs/download/{{ g.persona }}/{{ g.date }}/{{ f.name }}">⬇ télécharger</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>
+{% endfor %}
+{% endblock %}
