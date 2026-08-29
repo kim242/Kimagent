@@ -71,6 +71,45 @@ class TestPipeline(unittest.TestCase):
         self.assertIn("€", report)
 
 
+class TestObjectif(unittest.TestCase):
+    """Valide le tableau de bord objectif CA (conversion FCFA, écarts, CSV)."""
+
+    def test_to_xaf_conversions(self):
+        from kimagent.utils import to_xaf, fmt_xaf
+
+        self.assertAlmostEqual(to_xaf({"value": 100, "currency": "EUR"}), 65595.7, places=1)
+        self.assertEqual(to_xaf({"value": 800000, "currency": "XAF"}), 800000)
+        self.assertAlmostEqual(to_xaf(50, "USD"), 30000, places=0)
+        self.assertIn("FCFA", fmt_xaf(800000))
+
+    def test_dashboard_achieved(self):
+        from kimagent.pipeline import objectif_dashboard
+
+        text = objectif_dashboard(get_demo_data(), target_xaf=800000)
+        self.assertIn("Objectif : 800 000 FCFA", text)
+        self.assertIn("ATTEINT", text)
+        self.assertIn("4 468 379 FCFA", text)  # 6812 € × 655,957
+
+    def test_dashboard_gap(self):
+        from kimagent.pipeline import objectif_dashboard
+
+        text = objectif_dashboard(get_demo_data(), target_xaf=5000000)
+        self.assertIn("Écart restant", text)
+        self.assertIn("ventes nécessaires", text.lower())
+        self.assertIn("FCFA", text)
+
+    def test_export_csv_segments(self):
+        from kimagent.pipeline import export_customers_csv
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = export_customers_csv(get_demo_data(), Path(tmp) / "prospects.csv")
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("segment", content)
+            self.assertIn("affilie", content)
+            self.assertIn("vip", content)
+            self.assertIn("total_depense_fcfa", content)
+
+
 class TestEbookEngine(unittest.TestCase):
     """Valide le moteur de rédaction d'e-books (découpage, comptage, assemblage)."""
 

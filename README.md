@@ -17,6 +17,7 @@ financières, relances clients et programme d'affiliation.
 | **support** | Campagnes paniers abandonnés, réactivation clients, collecte d'avis | 3 emails de relance prêts à envoyer |
 | **affiliation** | Audit du programme, plan de recrutement, kit de vente pour affiliés | Email d'invitation affiliés |
 | **ebook** | Analyse marché, plan, **rédaction complète d'e-books**, page de vente, couverture | E-book 4 000-8 000 mots prêt à publier |
+| **objectif** | Analyse d'écart, plan de vente 30 jours, prospection clients, offres, suivi | **800 000 FCFA de CA en 30 jours**, avec tableau de bord quotidien |
 
 ## 🚀 Démarrage rapide (2 minutes)
 

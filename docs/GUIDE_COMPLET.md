@@ -84,7 +84,7 @@ de 60 requêtes/min du serveur MCP.
 
 ## 5. Générer des livrables avec les agents
 
-### 5.1 Les 7 personas
+### 5.1 Les 8 personas
 
 | Persona | Tâches (livrables) |
 |---|---|
@@ -95,6 +95,7 @@ de 60 requêtes/min du serveur MCP.
 | `support` | paniers abandonnés, réactivation, avis |
 | `affiliation` | audit programme, recrutement, kit de vente |
 | `ebook` | analyse marché, plan, **rédaction complète d'e-book**, page de vente, couverture |
+| `objectif` | **objectif CA 30 jours (800 000 FCFA)** : analyse d'écart, plan de vente, prospection, offres, suivi |
 
 ### 5.2 Lancer un agent
 
@@ -179,6 +180,11 @@ Limite : 100 requêtes/min. Ne committez jamais `.env`.
    les meilleures ventes de votre boutique, choisit le sujet le plus rentable,
    rédige l'e-book complet, puis fournit la fiche produit Chariow et la page
    de vente prêtes à publier (voir [`agents/personas/ebook.md`](../agents/personas/ebook.md)).
+7. **Atteindre 800 000 FCFA / 30 jours** — `kimagent run objectif` pour le
+   plan de vente, la prospection et les offres ; puis `kimagent objectif`
+   chaque matin pour suivre l'écart (ventes/visites nécessaires, rythme par
+   jour) ; `kimagent objectif --csv` exporte la liste clients segmentée
+   (voir [`agents/personas/objectif.md`](../agents/personas/objectif.md)).
 
 ---
 

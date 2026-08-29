@@ -76,6 +76,35 @@ def fmt_money(value, currency: str = "EUR") -> str:
     return f"{num:,.2f} {symbol}".replace(",", " ")
 
 
+# ── Conversion FCFA (XAF) ────────────────────────────────────────────────────
+# Taux indicatifs (1 EUR = 655,957 FCFA — parité fixe CFA)
+XAF_PER_EUR = 655.957
+_XAF_RATES = {"EUR": XAF_PER_EUR, "USD": 600.0, "GBP": 770.0}
+
+
+def to_xaf(money, default_currency: str = "EUR") -> float:
+    """Convertit un montant (dict {value, currency} ou nombre) en FCFA (XAF)."""
+    if isinstance(money, dict):
+        currency = money.get("currency", default_currency)
+        value = money.get("value", 0)
+    else:
+        currency, value = default_currency, money
+    try:
+        num = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    cur = str(currency).upper()
+    if cur in ("XAF", "XOF", "FCFA"):
+        return num
+    rate = _XAF_RATES.get(cur)
+    return num * rate if rate else num
+
+
+def fmt_xaf(value: float) -> str:
+    """Formate un montant en FCFA : 1 234 567 FCFA."""
+    return f"{value:,.0f} FCFA".replace(",", " ")
+
+
 def age_hours(path: Path) -> float:
     """Âge d'un fichier en heures (infini s'il n'existe pas)."""
     if not path.exists():

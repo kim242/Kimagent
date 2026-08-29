@@ -15,6 +15,7 @@ gagner de l'argent** avec votre boutique Chariow.
 | [`support.md`](support.md) | Relation Client & Relances | récupérant les paniers abandonnés et fidélisant |
 | [`affiliation.md`](affiliation.md) | Programme d'Affiliation | déployant un réseau d'affiliés qui vendent pour vous |
 | [`ebook.md`](ebook.md) | **Éditeur d'E-books** | **rédigeant des e-books professionnels qui résolvent de vrais problèmes et se vendent** |
+| [`objectif.md`](objectif.md) | **Agent de Vente 30 Jours** | **pilote la vente pour atteindre 800 000 FCFA de CA en 30 jours** |
 
 ## Deux façons de les utiliser
 

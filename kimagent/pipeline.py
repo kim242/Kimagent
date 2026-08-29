@@ -13,7 +13,9 @@ Flux normal (mode automatique) :
 from __future__ import annotations
 
 import asyncio
+import csv
 from datetime import datetime
+from math import ceil
 from pathlib import Path
 
 from . import utils
@@ -194,6 +196,137 @@ def report(demo: bool = False, force_fetch: bool = False) -> str:
     settings = Settings()
     data = load_data(settings, force_fetch=force_fetch, demo=demo)
     return build_report(data)
+
+
+# ── Tableau de bord objectif de CA (30 jours) ────────────────────────────────
+def objectif_dashboard(data: dict, target_xaf: int | None = None) -> str:
+    """Calcule l'écart entre le CA 30 jours et l'objectif (en FCFA). Purement local."""
+    settings = Settings()
+    target = target_xaf or settings.sales_target_xaf
+
+    tools = data.get("tools", data)
+    store = tools.get("get_store") or {}
+    summary = store.get("sales_summary", {})
+    an = tools.get("get_store_analytics") or {}
+    sa = tools.get("get_sales_analytics") or {}
+
+    rev30 = summary.get("last_30_days_revenue") or sa.get("revenue") or {}
+    rev_xaf = utils.to_xaf(rev30, settings.store_default_currency)
+    aov_xaf = utils.to_xaf(summary.get("avg_order_value"), settings.store_default_currency)
+    conv = float(an.get("conversion_rate") or 0)
+    visits = int(an.get("visits") or 0)
+
+    gap = max(0.0, target - rev_xaf)
+    progress = (rev_xaf / target * 100) if target else 0.0
+    achieved = rev_xaf >= target
+
+    sales_needed = ceil(gap / aov_xaf) if (gap > 0 and aov_xaf > 0) else 0
+    visits_needed = ceil(sales_needed / (conv / 100)) if (sales_needed > 0 and conv > 0) else 0
+
+    lines: list[str] = []
+    lines.append(f"# 🎯 Objectif : {utils.fmt_xaf(target)} / 30 jours")
+    lines.append("")
+    lines.append(f"Boutique : **{store.get('name', '?')}**")
+    lines.append("")
+    lines.append("## Situation actuelle (30 derniers jours)")
+    lines.append("")
+    lines.append(f"- Revenu 30 j : **{utils.fmt_xaf(rev_xaf)}**")
+    lines.append(f"- Progression : **{progress:.0f} %** de l'objectif")
+    lines.append(f"- Panier moyen : {utils.fmt_xaf(aov_xaf)}")
+    lines.append(f"- Visites : {visits:,}".replace(",", " "))
+    lines.append(f"- Taux de conversion : {conv:.2f} %")
+
+    lines.append("")
+    if achieved:
+        lines.append(f"## ✅ Objectif ATTEINT ({progress:.0f} %)")
+        lines.append("")
+        lines.append(f"- Excédent : {utils.fmt_xaf(rev_xaf - target)}")
+        next_target = int(rev_xaf * 1.5)
+        lines.append(
+            f"- Suggestion : visez le prochain palier {utils.fmt_xaf(next_target)} "
+            f"(KIMAGENT_OBJECTIF_XAF={next_target} dans .env)."
+        )
+    else:
+        lines.append(f"## ⏳ Écart restant : {utils.fmt_xaf(gap)}")
+        lines.append("")
+        lines.append(f"- Ventes nécessaires : **{sales_needed:,}**".replace(",", " "))
+        lines.append(f"  (panier moyen {utils.fmt_xaf(aov_xaf)})")
+        if visits_needed:
+            lines.append(f"- Visites nécessaires : **{visits_needed:,}**".replace(",", " "))
+            lines.append(f"  (conversion actuelle {conv:.2f} %)")
+        per_day = ceil(sales_needed / 30)
+        plural = "" if per_day == 1 else "s"
+        lines.append(f"- Rythme requis : **{per_day} vente{plural} / jour** "
+                     f"≈ {utils.fmt_xaf(gap / 30)} / jour")
+        lines.append("")
+        lines.append("## Répartition par produit (suggestion)")
+        top = sa.get("top_products") or []
+        if top:
+            total_top = sum(float(p.get("revenue") or 0) for p in top)
+            for p in top[:5]:
+                share = (float(p.get("revenue") or 0) / total_top * 100) if total_top else 0
+                target_prod = gap * share / 100
+                lines.append(
+                    f"- {p.get('product', '?')} : viser {utils.fmt_xaf(target_prod)} "
+                    f"({share:.0f} % de l'effort)"
+                )
+        lines.append("")
+        lines.append("> Actions : `kimagent run objectif --tasks plan` pour le plan de "
+                     "vente 30 jours, puis suivez ce tableau de bord chaque jour.")
+
+    lines.append("")
+    lines.append(f"*Source : {data.get('meta', {}).get('source', '?')} — "
+                 f"extrait le {data.get('meta', {}).get('fetched_at', '?')}*")
+    return "\n".join(lines)
+
+
+def export_customers_csv(data: dict, path: Path) -> Path:
+    """Exporte la liste des clients segmentée (VIP, inactifs, affiliés…) en CSV.
+
+    Utile pour la prospection : importez ce fichier dans votre outil d'emailing
+    ou de messagerie (WhatsApp Business, Brevo, Mailchimp…).
+    """
+    tools = data.get("tools", data)
+    customers = (tools.get("list_customers") or {}).get("data", [])
+    if not customers:
+        raise ValueError("Aucun client dans les données — lancez `kimagent fetch` d'abord.")
+
+    today = datetime.now().date()
+    rows = []
+    for c in customers:
+        spent = utils.to_xaf(c.get("total_spent"), Settings().store_default_currency)
+        last_order = c.get("last_order") or ""
+        try:
+            days_inactive = (today - datetime.strptime(last_order[:10], "%Y-%m-%d").date()).days
+        except Exception:
+            days_inactive = 0
+        orders = int(c.get("orders_count") or 0)
+
+        if c.get("is_affiliate"):
+            segment = "affilie"
+        elif spent >= 100 * 655.957 or orders >= 5:  # ≈ 100 € ou 5+ commandes
+            segment = "vip"
+        elif days_inactive >= 60:
+            segment = "inactif_60j"
+        else:
+            segment = "actif_recent"
+
+        rows.append({
+            "nom": c.get("name", ""),
+            "email": c.get("email", ""),
+            "pays": c.get("country", ""),
+            "segment": segment,
+            "total_depense_fcfa": round(spent),
+            "commandes": orders,
+            "derniere_commande": last_order,
+        })
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
+    return path
 
 
 def list_personas_table() -> str:

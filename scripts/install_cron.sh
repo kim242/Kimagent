@@ -11,7 +11,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PERSONAS="${1:-marketing,ventes,finance}"
+PERSONAS="${1:-marketing,ventes,finance,objectif}"
 HEURE="${2:-7}"
 AUTO="${3:-}"
 

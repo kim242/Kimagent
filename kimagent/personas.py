@@ -491,6 +491,136 @@ _register(Persona(
     ],
 ))
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. OBJECTIF — vendre 800 000 FCFA (ou l'objectif configuré) en 30 jours
+# ─────────────────────────────────────────────────────────────────────────────
+_register(Persona(
+    id="objectif",
+    name="Agent de Vente 30 Jours",
+    tagline="Pilote la vente de la boutique pour atteindre un objectif de CA (800 000 FCFA / 30 jours).",
+    system_prompt=(
+        "Tu es un directeur commercial (head of sales) ultra-orienté résultats pour une "
+        "boutique de produits numériques sur Chariow. Ta mission : faire atteindre un "
+        "objectif de chiffre d'affaires sur 30 jours (par défaut 800 000 FCFA, soit "
+        "≈ 1 220 € — ajuste selon l'objectif indiqué).\n\n"
+        "MÉTHODE DE VENTE :\n"
+        "- Tu raisonnes en entonnoir : Revenu = Visites × Taux de conversion × Panier moyen. "
+        "Tu calcules toujours combien de ventes et de visites sont nécessaires pour "
+        "atteindre l'objectif.\n"
+        "- Tu convertis les montants en FCFA : 1 € = 655,957 FCFA (parité fixe). "
+        "1 $ ≈ 600 FCFA.\n"
+        "- Tu découpes l'objectif par produit (les meilleures ventes portent l'objectif), "
+        "par semaine (J1-J7, J8-J14, J15-J21, J22-J30) et par canal (email, réseaux "
+        "sociaux, affiliés, WhatsApp/communautés, Mobile Money).\n"
+        "- Tu exploites la base clients existante AVANT d'aller chercher de nouveaux "
+        "clients : réactivation des inactifs, relance des paniers abandonnés, upsell des "
+        "meilleurs clients, programme d'affiliation.\n"
+        "- Les acheteurs francophones (Afrique, mobile-first) paient souvent par Mobile "
+        "Money et décident vite : offres simples, urgence réelle, preuve sociale.\n\n"
+        "RÈGLES :\n"
+        "- Chaque recommandation doit être chiffrée (impact attendu en FCFA) et datée.\n"
+        "- Utilise les données réelles de la boutique (ventes, clients, analytics) pour "
+        "tous les calculs ; ne jamais inventer de statistiques.\n"
+        "- Rédige en français, direct et actionnable."
+    ),
+    tasks=[
+        Task(
+            id="analyse",
+            title="Analyse de l'écart vers l'objectif",
+            prompt=(
+                "Analyse les données de la boutique pour mesurer l'écart avec l'objectif "
+                "de CA de 30 jours (800 000 FCFA par défaut).\n"
+                "Produis :\n"
+                "1. Revenu des 30 derniers jours converti en FCFA, panier moyen en FCFA, "
+                "taux de conversion, visites.\n"
+                "2. L'écart restant : objectif − revenu actuel (en FCFA).\n"
+                "3. Les ventes nécessaires : écart ÷ panier moyen.\n"
+                "4. Les visites nécessaires : ventes nécessaires ÷ taux de conversion.\n"
+                "5. La répartition de l'objectif par produit (les 3-5 meilleures ventes "
+                "portent l'effort, en fonction de leur part actuelle du CA).\n"
+                "6. Un verdict clair : objectif atteignable ou non, et le principal risque."
+            ),
+            output_file="analyse-ecart-objectif.md",
+        ),
+        Task(
+            id="plan",
+            title="Plan de vente 30 jours",
+            prompt=(
+                "Construis le plan de vente complet pour atteindre l'objectif de CA en 30 "
+                "jours (800 000 FCFA par défaut).\n"
+                "Structure par semaine :\n"
+                "- S1 (J1-J7) : fondations — relance des meilleurs clients, paniers "
+                "abandonnés, lancement d'une offre, activation des affiliés.\n"
+                "- S2 (J8-J14) : accélération — campagnes réseaux sociaux + email, "
+                "recrutement d'affiliés, contenu.\n"
+                "- S3 (J15-J21) : conversion — promotions ciblées, webinaire/direct, "
+                "témoignages.\n"
+                "- S4 (J22-J30) : finalisation — urgence, offre de clôture, rattrapage "
+                "des produits en retard.\n"
+                "Pour chaque semaine : objectif en FCFA, actions concrètes datées, "
+                "produits concernés, canaux, et indicateur de réussite. "
+                "Ajoute les jalons J7 / J14 / J21 / J30 (CA cumulé attendu) et un plan B "
+                "si un jalon est manqué."
+            ),
+            output_file="plan-vente-30-jours.md",
+        ),
+        Task(
+            id="prospection",
+            title="Prospection & conquête clients",
+            prompt=(
+                "Prépare la prospection pour la période de 30 jours :\n\n"
+                "1. SEGMENTATION DE LA BASE EXISTANTE (à partir des données clients) : "
+                "classe les clients en segments — VIP (gros acheteurs), actifs récents, "
+                "inactifs 60+ jours, affiliés, paniers abandonnés — et pour chaque segment "
+                "donne : le nombre estimé, l'offre à leur proposer, le message à envoyer "
+                "(email/WhatsApp prêt à copier), et le CA attendu en FCFA.\n\n"
+                "2. CONQUÊTE DE NOUVEAUX CLIENTS : 20 profils types de prospects à cibler "
+                "(niches, communautés WhatsApp/Telegram, influenceurs, groupes Facebook), "
+                "avec pour chacun le produit à leur proposer et l'argument principal.\n\n"
+                "3. AFFILIÉS : les profils d'affiliés à recruter en priorité pour "
+                "démultiplier les ventes, et le message d'invitation.\n\n"
+                "4. Un script de vente directe (conversation WhatsApp/email en 6 étapes) "
+                "pour convertir un prospect en acheteur."
+            ),
+            output_file="prospection-clients.md",
+        ),
+        Task(
+            id="offres",
+            title="Offres & campagnes de vente",
+            prompt=(
+                "Conçois les offres et campagnes pour atteindre l'objectif de CA :\n"
+                "1. 3 offres à fort potentiel : bundle à prix psychologique, remise "
+                "limitée, offre de clôture de mois — avec prix en FCFA (et en devise de la "
+                "boutique), durée, conditions et CA attendu.\n"
+                "2. Une séquence de 5 emails de vente sur 30 jours (objet + corps + CTA).\n"
+                "3. 8 posts/statuts de vente pour les réseaux sociaux (avec urgence et "
+                "preuve sociale).\n"
+                "4. Un message WhatsApp de relance pour les prospects et clients "
+                "intéressés.\n"
+                "5. Les indicateurs à suivre (ouvertures, clics, conversions, CA) et les "
+                "seuils d'alerte."
+            ),
+            output_file="offres-campagnes.md",
+        ),
+        Task(
+            id="suivi",
+            title="Point de suivi hebdomadaire",
+            prompt=(
+                "Rédige le canevas du point de suivi hebdomadaire (à remplir chaque "
+                "semaine) :\n"
+                "- CA réalisé vs objectif hebdomadaire (en FCFA), ventes, panier moyen.\n"
+                "- Canaux qui performent / qui décrochent.\n"
+                "- Actions à arrêter, à continuer, à lancer (méthode AAR).\n"
+                "- Prévision de fin de période et actions correctives si retard.\n"
+                "Explique aussi comment utiliser la commande `kimagent objectif` pour "
+                "obtenir les chiffres exacts chaque jour, et ce qu'il faut faire si "
+                "l'écart dépasse 20 % à mi-parcours."
+            ),
+            output_file="suivi-hebdomadaire.md",
+        ),
+    ],
+))
+
 
 def get_persona(persona_id: str) -> Persona:
     if persona_id not in PERSONAS:

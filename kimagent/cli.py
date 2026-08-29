@@ -74,6 +74,14 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="Personas à planifier (séparés par des virgules)")
     p_cron.add_argument("--heure", default="7", help="Heure d'exécution (0-23)")
 
+    p_obj = sub.add_parser("objectif", help="Tableau de bord : objectif de CA 30 jours (FCFA)")
+    p_obj.add_argument("--demo", action="store_true", help="Utiliser les données de démonstration")
+    p_obj.add_argument("--force", action="store_true", help="Forcer le rafraîchissement MCP")
+    p_obj.add_argument("--cible", type=int, default=None,
+                       help="Objectif en FCFA (défaut : KIMAGENT_OBJECTIF_XAF ou 800000)")
+    p_obj.add_argument("--csv", type=Path, default=None,
+                       help="Exporter la liste clients segmentée (prospection) à ce chemin")
+
     return parser
 
 
@@ -229,6 +237,21 @@ def _cmd_prompts(args) -> int:
     return 0
 
 
+def _cmd_objectif(args) -> int:
+    from .pipeline import export_customers_csv, objectif_dashboard
+
+    data = load_data(Settings(), force_fetch=args.force, demo=args.demo)
+    print(objectif_dashboard(data, target_xaf=args.cible))
+    if args.csv:
+        try:
+            path = export_customers_csv(data, args.csv)
+            utils.ok(f"Liste clients segmentée exportée : {path}")
+        except ValueError as e:
+            utils.err(str(e))
+            return 1
+    return 0
+
+
 def _cmd_cron(args) -> int:
     python = str(REPO_ROOT / ".venv" / "bin" / "python")
     kimagent = str(REPO_ROOT / "kimagent" / "cli.py")
@@ -257,6 +280,7 @@ def main(argv: list[str] | None = None) -> int:
         "list": _cmd_list,
         "prompts": _cmd_prompts,
         "cron": _cmd_cron,
+        "objectif": _cmd_objectif,
     }
     return handlers[args.command](args)
 

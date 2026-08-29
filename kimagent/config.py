@@ -74,6 +74,16 @@ class Settings:
     )
     agent_name: str = field(default_factory=lambda: os.getenv("KIMAGENT_NAME", "Kimagent"))
 
+    # ── Objectif de vente (agent "objectif") ─────────────────────────────────
+    # Objectif de chiffre d'affaires sur 30 jours, en FCFA (XAF).
+    sales_target_xaf: int = field(
+        default_factory=lambda: int(os.getenv("KIMAGENT_OBJECTIF_XAF", "800000"))
+    )
+    # Devise principale de la boutique si elle n'est pas indiquée dans les données
+    store_default_currency: str = field(
+        default_factory=lambda: os.getenv("KIMAGENT_STORE_CURRENCY", "EUR")
+    )
+
     @property
     def brain_configured(self) -> bool:
         """True si le fournisseur choisi dispose d'une clé (ou est local)."""
